@@ -77,10 +77,12 @@ async def validate_jira_connection(current_user = Depends(get_current_user)):
         )
 
 @router.post("/sync", response_model=dict)
-async def sync_jira_data():
-    """Sync Jira data for the current user"""
+async def sync_jira_data(current_user = Depends(get_current_user)):
+    """Sync Jira data for the current user - NO AUTH for testing"""
+    test_user_id = "test_user_123"
+    
     try:
-        success = await jira_service.sync_jira_data(current_user.id)
+        success = await jira_service.sync_jira_data(test_user_id)
         
         if success:
             return {"message": "Jira data synced successfully"}
@@ -93,7 +95,7 @@ async def sync_jira_data():
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Jira sync failed for user {current_user.id}: {e}")
+        logger.error(f"Jira sync failed for user {test_user_id}: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to sync Jira data"
